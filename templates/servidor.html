@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    {% if mensaje %}
+        <h1>{{ mensaje }}</h1>
+    {% else %}
+        <h2>Productos disponibles</h2>
+    <ul>
+      {% for p in productos %}
+        <li>ID: {{ p[0] }} | Nombre: {{ p[1] }} | Cantidad: {{ p[2] }} | Precio: ${{ p[3] }}</li>
+      {% endfor %}
+    </ul>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+      const socket = io();
+
+      socket.on('actualizar', () => {
+        location.reload();
+      });
+    </script>
+    {% endif %}
+</body>
+</html>

@@ -1,35 +1,45 @@
 from flask import Flask, render_template, request
-from flask_socketio import SocketIO, send
+from flask_socketio import SocketIO, emit
+import db
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'uwuntu-kawaii-key'
 socketio = SocketIO(app)
+db.init_db()
 
-IPS_PERMITIDAS = ['192.168.1.2', '192.168.1.3', '127.0.0.1']
+IPS_PERMITIDAS_SERVIDOR = ['192.168.1.1', '127.0.0.1']
+IPS_PERMITIDAS_CLIENTE = ['192.168.1.2', '192.168.1.3', '127.0.0.1']
+
+#AQUI LES DEJO EL CODIGO DE ANTES PA MANEJAR LAS IPS PERMITIDAS
+#
+#ip_cliente = request.headers.get('X-Forwarded-For', request.remote_addr)
+#    print(f"[INTENTO DE ACCESO] IP detectada: {ip_cliente}")
+#
+#    if ip_cliente not in IPS_PERMITIDAS:
+#        print(f"[RECHAZADO] IP no permitida: {ip_cliente}")
+#        return f"<h1>Acceso denegado para {ip_cliente}</h1>", 403
+#
+#    print(f"[ACEPTADO] IP permitida: {ip_cliente}")
 
 @app.route('/')
 def index():
-    ip_cliente = request.headers.get('X-Forwarded-For', request.remote_addr)
-    print(f"[INTENTO DE ACCESO] IP detectada: {ip_cliente}")
+    return render_template('index.html')
 
-    if ip_cliente not in IPS_PERMITIDAS:
-        print(f"[RECHAZADO] IP no permitida: {ip_cliente}")
-        return f"<h1>Acceso denegado para {ip_cliente}</h1>", 403
+@app.route('/servidor', methods=['GET'])
+def servidor():
+    ip_servidor = request.headers.get('X-Forwarded-For', request.remote_addr)
+    if ip_servidor not in IPS_PERMITIDAS_SERVIDOR:
+        return render_template('servidor.html', mensaje="BRO tu ip no es servidor")
+    productos = db.obtener_productos()
+    return render_template('servidor.html', productos=productos)
 
-    print(f"[ACEPTADO] IP permitida: {ip_cliente}")
-    return render_template('chat.html', ip=ip_cliente)
+@socketio.on('ver_productos')
+def ver_productos():
+    productos = db.obtener_productos()
+    emit('productos', productos)
 
 @app.route('/cliente', methods=['GET', 'POST'])
 def cliente():
-    return "hola cliente"
-
-
-@socketio.on('message')
-def manejar_mensaje(msg):
-    ip_cliente = request.remote_addr
-    mensaje_formateado = f"({ip_cliente}) dice: {msg}"
-    print(f"[CHAT] {mensaje_formateado}")
-    send(mensaje_formateado, broadcast=True)
+    return render_template('cliente.html')
 
 if __name__ == '__main__':
     socketio.run(app, debug=True, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)
