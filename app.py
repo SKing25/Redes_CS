@@ -28,7 +28,7 @@ def index():
 def servidor():
     ip_servidor = request.headers.get('X-Forwarded-For', request.remote_addr)
     if ip_servidor not in IPS_PERMITIDAS_SERVIDOR:
-        return render_template('servidor.html', mensaje="BRO tu ip no es servidor")
+        return render_template('servidor.html', mensaje=f"BRO tu ip no es servidor {ip_servidor}")
     productos = db.obtener_productos()
     return render_template('servidor.html', productos=productos)
 
