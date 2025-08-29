@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat 🌸</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+    <h2>Bienvenido al Chat 🌸</h2>
+    <p>Tu IP detectada es: <strong>{{ ip }}</strong></p>
+    <ul id="mensajes"></ul>
+    <input id="mensaje" autocomplete="off" placeholder="Escribe tu mensaje kawaii..." />
+    <button onclick="enviar()">Enviar</button>
+
+    <script>
+        const socket = io();
+
+        socket.on('message', function(msg) {
+            const item = document.createElement('li');
+            item.textContent = msg;
+            document.getElementById('mensajes').appendChild(item);
+        });
+
+        function enviar() {
+            const input = document.getElementById('mensaje');
+            if (input.value.trim() !== '') {
+                socket.send(input.value);
+                input.value = '';
+            }
+        }
+    </script>
+</body>
+</html>
