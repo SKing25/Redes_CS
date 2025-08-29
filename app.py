@@ -19,6 +19,11 @@ def index():
     print(f"[ACEPTADO] IP permitida: {ip_cliente}")
     return render_template('chat.html', ip=ip_cliente)
 
+@app.route('/cliente', methods=['GET', 'POST'])
+def cliente():
+    return "hola cliente"
+
+
 @socketio.on('message')
 def manejar_mensaje(msg):
     ip_cliente = request.remote_addr
