@@ -6,7 +6,7 @@ app = Flask(__name__)
 socketio = SocketIO(app)
 db.init_db()
 
-IPS_PERMITIDAS_SERVIDOR = ['192.168.1.1', '127.0.0.1', '186.155.14.223'] #mas ips
+IPS_PERMITIDAS_SERVIDOR = ['192.168.1.1', '127.0.0.1', '186.155.14.223']
 IPS_PERMITIDAS_CLIENTE = ['192.168.1.2', '192.168.1.3', '127.0.0.1']
 
 #AQUI LES DEJO EL CODIGO DE ANTES PA MANEJAR LAS IPS PERMITIDAS
@@ -30,12 +30,7 @@ def servidor():
     if ip_servidor not in IPS_PERMITIDAS_SERVIDOR:
         return render_template('servidor.html', mensaje=f"BRO tu ip no es servidor {ip_servidor}")
     productos = db.obtener_productos()
-    return render_template('servidor.html', productos=productos)
-
-@socketio.on('ver_productos')
-def ver_productos():
-    productos = db.obtener_productos()
-    emit('productos', productos)
+    return render_template('servidor.html', productos=productos, ip=ip_servidor)
 
 @app.route('/cliente', methods=['GET', 'POST'])
 def cliente():

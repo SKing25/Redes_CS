@@ -18,8 +18,11 @@ def init_db():
 
 def obtener_productos():
     conn = sqlite3.connect(DB_NAME)
-    productos = conn.execute('SELECT * FROM productos').fetchall()
+    conn.row_factory = sqlite3.Row
+    productos_rows = conn.execute('SELECT * FROM productos').fetchall()
     conn.close()
+
+    productos = [dict(row) for row in productos_rows]
     return productos
 
 def crear_producto(nombre, cantidad, precio):
