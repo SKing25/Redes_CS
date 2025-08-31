@@ -1,13 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
 
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👥 Cliente - Los Templos Menores 👥</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 </head>
-
-<body><label class="theme-switch position-top-right">
+<body>
+    <label class="theme-switch position-top-right">
         <input type="checkbox" id="themeToggle" class="theme-switch__checkbox">
         <div class="theme-switch__container">
             <div class="theme-switch__clouds"></div>
@@ -35,11 +38,84 @@
         <a href="{{ url_for('servidor') }}" class="page-item" data-page="servidor"><span>Servidor</span></a>
     </div>
 
-
-    <div class="main-card">
-        <span>coman monda</span>
+    <div class="header">
+        <h1>👥 El Templo Menor del Cliente 👥</h1>
+        <p>Panel de Control del Inventario Divino</p>
+        <div class="ip-info">
+            <span id="ip-display">IP del Cliente: {{ ip if ip else 'No detectada' }}</span>
+        </div>
+        {% if mensaje %}
+        <div class="mensaje-error">
+            {{ mensaje }}
+        </div>
+        {% endif %}
     </div>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-</body>
 
+    <div class="main-container">
+        <!-- Sección de Creación de Productos -->
+        <div class="form-section">
+            <h2>🛍️ Crear Producto Divino</h2>
+            <form id="formCrearProducto">
+                <div class="form-group">
+                    <label for="nombre">📦 Nombre del Producto:</label>
+                    <input type="text" id="nombre" name="nombre" placeholder="Ingresa el nombre sagrado..." required>
+                </div>
+
+                <div class="form-group">
+                    <label for="cantidad">📊 Cantidad:</label>
+                    <input type="number" id="cantidad" name="cantidad" placeholder="¿Cuántos existen?" min="0" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="precio">💰 Precio:</label>
+                    <input type="number" id="precio" name="precio" placeholder="Su valor en el reino..." step="0.01" min="0" required>
+                </div>
+
+                <button type="submit" class="divine-button crear-btn">✨ Crear Producto ✨</button>
+            </form>
+        </div>
+
+        <!-- Sección de Inventario -->
+        <div class="products-section">
+            <div class="products-header">
+                <h2>📋 Inventario Sagrado</h2>
+                <div class="status-indicator" id="statusIndicator">
+                    🟢 En Línea
+                </div>
+            </div>
+
+            <div class="products-grid" id="productosContainer">
+                {% if productos %}
+                    {% for producto in productos %}
+                    <div class="product-card" data-id="{{ producto['id'] }}">
+                        <div class="product-header">
+                            <span class="product-name">{{ producto['nombre'] }}</span>
+                            <span class="product-id">ID: {{ producto['id'] }}</span>
+                        </div>
+
+                        <div class="product-details">
+                            <div class="detail-item">
+                                <div class="detail-label">Cantidad</div>
+                                <div class="detail-value">{{ producto['cantidad'] }}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Precio</div>
+                                <div class="detail-value">${{ "%.2f"|format(producto['precio']) }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-products">
+                        <h3>🏺 El inventario está vacío</h3>
+                        <p>Los dioses esperan que añadas el primer producto sagrado...</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+  
+</body>
 </html>
+
