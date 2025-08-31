@@ -103,7 +103,7 @@
                         </div>
 
                         <div class="product-actions">
-                            <button class="action-btn edit-btn" onclick="editarProducto({{ producto['id'] }}, '{{ producto['nombre'] }}', {{ producto['cantidad'] }}, {{ producto['precio'] }})">
+                            <button class="action-btn edit-btn" onclick="editarProducto({{ producto['id'] }}, {{ producto['nombre']|tojson }}, {{ producto['cantidad'] }}, {{ producto['precio'] }})">
                                 ✏️ Editar
                             </button>
                             <button class="action-btn delete-btn" onclick="eliminarProducto({{ producto['id'] }})">
@@ -123,10 +123,11 @@
     </div>
 
     <!-- Modal de Edición -->
-    <div id="modalEditar" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; display: flex; justify-content: center; align-items: center;">
-        <div style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); padding: 30px; border-radius: 15px; width: 90%; max-width: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+    <div id="modalEditar" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000;">
+        <div style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); padding: 30px; border-radius: 15px; width: 90%; max-width: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
             <h3 style="color: #ffd700; margin-bottom: 20px; text-align: center;">✏️ Editar Producto Divino</h3>
             <form id="formEditarProducto">
+                <input type="hidden" id="editId" name="id">
                 <div class="form-group">
                     <label for="editNombre">📦 Nombre:</label>
                     <input type="text" id="editNombre" name="nombre" required>
@@ -147,10 +148,105 @@
         </div>
     </div>
 
-    {% endif %}
-  </div>
+    <script>
+        // Variables globales para JavaScript
+        let editandoId = null;
 
-  <script src="{{ url_for('static', filename='script.js') }}"></script>
+        // Función para editar producto
+        function editarProducto(id, nombre, cantidad, precio) {
+            editandoId = id;
+            document.getElementById('editId').value = id;
+            document.getElementById('editNombre').value = nombre;
+            document.getElementById('editCantidad').value = cantidad;
+            document.getElementById('editPrecio').value = precio;
+            document.getElementById('modalEditar').style.display = 'block';
+        }
+
+        // Función para eliminar producto
+        function eliminarProducto(id) {
+            if (confirm('¿Estás seguro de que deseas eliminar este producto divino?')) {
+                // Aquí iría la lógica para eliminar el producto
+                fetch(`/eliminar/${id}`, {
+                    method: 'DELETE',
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error al eliminar el producto');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al eliminar el producto');
+                });
+            }
+        }
+
+        // Función para cerrar modal
+        function cerrarModal() {
+            document.getElementById('modalEditar').style.display = 'none';
+            editandoId = null;
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Formulario de crear producto
+            document.getElementById('formCrearProducto').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                
+                fetch('/crear', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error al crear el producto');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al crear el producto');
+                });
+            });
+
+            // Formulario de editar producto
+            document.getElementById('formEditarProducto').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                
+                fetch(`/editar/${editandoId}`, {
+                    method: 'PUT',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error al editar el producto');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al editar el producto');
+                });
+            });
+
+            // Cerrar modal al hacer clic fuera
+            document.getElementById('modalEditar').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    cerrarModal();
+                }
+            });
+        });
+    </script>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
-
 </html>
