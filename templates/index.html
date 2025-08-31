@@ -1,13 +1,214 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Gestor de inventario</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔥 El Templo Divino del Inventario 🔥</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .description {
+            font-size: 1.1em;
+            margin-bottom: 40px;
+            line-height: 1.6;
+            opacity: 0.8;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .divine-button {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            min-width: 150px;
+        }
+
+        .divine-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #ee5a24, #ff6b6b);
+        }
+
+        .divine-button:active {
+            transform: translateY(-1px) scale(1.02);
+        }
+
+        .servidor-btn {
+            background: linear-gradient(45deg, #4834d4, #686de0);
+        }
+
+        .servidor-btn:hover {
+            background: linear-gradient(45deg, #686de0, #4834d4);
+        }
+
+        .cliente-btn {
+            background: linear-gradient(45deg, #00d2d3, #54a0ff);
+        }
+
+        .cliente-btn:hover {
+            background: linear-gradient(45deg, #54a0ff, #00d2d3);
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 20px;
+            font-size: 0.9em;
+            opacity: 0.6;
+        }
+
+        .sparkle {
+            animation: sparkle 2s infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .button-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .divine-button {
+                width: 100%;
+                max-width: 250px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Gestor de Inventario</h1>
-    <p>Como deseas ingresar?</p>
-    <button onclick="location.href='/servidor'">Servidor</button>
-    <button onclick="location.href='/cliente'">Cliente</button>
+    <div class="container floating">
+        <h1 class="sparkle">🔥 Gestor de Inventario Divino 🔥</h1>
+        <p class="subtitle">El Templo Sagrado del Control Total</p>
+        <p class="description">
+            Bienvenido al reino donde los productos cobran vida y el inventario
+            se gestiona con la gracia de los dioses digitales. ¿Cómo deseas acceder
+            a este santuario de la eficiencia suprema?
+        </p>
+
+        <div class="button-container">
+            <button class="divine-button servidor-btn" onclick="location.href='/servidor'">
+                ⚡ Servidor ⚡<br>
+                <small style="font-size: 0.8em; opacity: 0.8;">El Templo Central</small>
+            </button>
+            <button class="divine-button cliente-btn" onclick="location.href='/cliente'">
+                👥 Cliente 👥<br>
+                <small style="font-size: 0.8em; opacity: 0.8;">Los Templos Menores</small>
+            </button>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Creado por manos divinas • El Código Divino 2024</p>
+    </div>
+
+    <script>
+        // Efectos visuales adicionales
+        document.addEventListener('DOMContentLoaded', function() {
+            // Agregar efecto de partículas en el fondo
+            const body = document.body;
+
+            for(let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.style.position = 'absolute';
+                particle.style.width = '2px';
+                particle.style.height = '2px';
+                particle.style.background = 'rgba(255, 255, 255, 0.5)';
+                particle.style.borderRadius = '50%';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animation = `sparkle ${2 + Math.random() * 3}s infinite`;
+                particle.style.zIndex = '-1';
+                body.appendChild(particle);
+            }
+        });
+
+        // Efecto de sonido al hacer hover (opcional)
+        document.querySelectorAll('.divine-button').forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                this.style.filter = 'brightness(1.2)';
+            });
+
+            button.addEventListener('mouseleave', function() {
+                this.style.filter = 'brightness(1)';
+            });
+        });
+    </script>
 </body>
 </html>
