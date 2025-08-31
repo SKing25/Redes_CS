@@ -27,261 +27,142 @@ def servidor():
     return render_template('servidor.html', productos=productos, ip=ip_servidor)
 
 
-@app.route('/cliente', methods=['GET', 'POST'])
+@app.route('/cliente', methods=['GET'])
 def cliente():
     ip_cliente = request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0].strip()
-
-    # Verificación de IP para clientes (opcional, puedes comentarlo si no lo necesitas)
-    # if ip_cliente not in IPS_PERMITIDAS_CLIENTE:
-    #     return f"<h1>Acceso denegado para {ip_cliente}</h1>", 403
-
-    return render_template('cliente.html')
+    if ip_cliente not in IPS_PERMITIDAS_CLIENTE:
+        return render_template('cliente.html', mensaje=f"BRO tu ip no es cliente {ip_cliente}")
+    productos = db.obtener_productos()
+    return render_template('cliente.html', productos=productos, ip=ip_cliente)
 
 
-# ==================== RUTAS CRUD PARA PRODUCTOS ====================
-
-# CREAR PRODUCTO - Ruta POST para añadir productos desde formulario
-@app.route('/producto/crear', methods=['POST'])
-def crear_producto():
-    try:
-        # Obtener datos del formulario
-        nombre = request.form.get('nombre')
-        cantidad = int(request.form.get('cantidad'))
-        precio = float(request.form.get('precio'))
-
-        # Validación básica
-        if not nombre or cantidad < 0 or precio < 0:
-            return jsonify({'error': 'Datos inválidos'}), 400
-
-        # Llamar a la función divina de creación
-        db.crear_producto(nombre, cantidad, precio)
-
-        # Obtener lista actualizada de productos
-        productos = db.obtener_productos()
-
-        # Emitir actualización a todos los clientes conectados via WebSocket
-        socketio.emit('actualizar_inventario', {
-            'accion': 'crear',
-            'productos': productos,
-            'mensaje': f'Producto {nombre} creado exitosamente'
-        }, broadcast=True)
-
-        # Si es petición AJAX, devolver JSON
-        if request.headers.get('Content-Type') == 'application/json':
-            return jsonify({'success': True, 'mensaje': 'Producto creado exitosamente'})
-
-        # Si no, redirigir según el origen
-        origen = request.form.get('origen', 'cliente')
-        if origen == 'servidor':
-            return redirect(url_for('servidor'))
-        return redirect(url_for('cliente'))
-
-    except Exception as e:
-        print(f"[ERROR DIVINO] Error creando producto: {e}")
-        return jsonify({'error': str(e)}), 500
-
-
-# ELIMINAR PRODUCTO - Ruta DELETE para eliminar productos
-@app.route('/producto/eliminar/<int:id_producto>', methods=['POST', 'DELETE'])
-def eliminar_producto(id_producto):
-    try:
-        # Llamar a la función de eliminación
-        db.eliminar_producto(id_producto)
-
-        # Obtener lista actualizada
-        productos = db.obtener_productos()
-
-        # Emitir actualización a todos los clientes
-        socketio.emit('actualizar_inventario', {
-            'accion': 'eliminar',
-            'productos': productos,
-            'id_eliminado': id_producto,
-            'mensaje': f'Producto ID {id_producto} eliminado'
-        }, broadcast=True)
-
-        if request.method == 'DELETE' or request.headers.get('Content-Type') == 'application/json':
-            return jsonify({'success': True, 'mensaje': 'Producto eliminado exitosamente'})
-
-        # Redirigir según origen
-        origen = request.args.get('origen', 'cliente')
-        if origen == 'servidor':
-            return redirect(url_for('servidor'))
-        return redirect(url_for('cliente'))
-
-    except Exception as e:
-        print(f"[ERROR DIVINO] Error eliminando producto: {e}")
-        return jsonify({'error': str(e)}), 500
-
-
-# MODIFICAR PRODUCTO - Ruta PUT/POST para actualizar productos
-@app.route('/producto/modificar/<int:id_producto>', methods=['POST', 'PUT'])
-def modificar_producto(id_producto):
-    try:
-        # Obtener datos del formulario o JSON
-        if request.is_json:
-            data = request.get_json()
-            nombre = data.get('nombre')
-            cantidad = int(data.get('cantidad'))
-            precio = float(data.get('precio'))
-        else:
-            nombre = request.form.get('nombre')
-            cantidad = int(request.form.get('cantidad'))
-            precio = float(request.form.get('precio'))
-
-        # Validación
-        if not nombre or cantidad < 0 or precio < 0:
-            return jsonify({'error': 'Datos inválidos'}), 400
-
-        # Llamar a la función de modificación
-        db.modificar_producto(id_producto, nombre, cantidad, precio)
-
-        # Obtener lista actualizada
-        productos = db.obtener_productos()
-
-        # Emitir actualización
-        socketio.emit('actualizar_inventario', {
-            'accion': 'modificar',
-            'productos': productos,
-            'id_modificado': id_producto,
-            'mensaje': f'Producto ID {id_producto} modificado'
-        }, broadcast=True)
-
-        if request.is_json or request.method == 'PUT':
-            return jsonify({'success': True, 'mensaje': 'Producto modificado exitosamente'})
-
-        # Redirigir según origen
-        origen = request.form.get('origen', 'cliente')
-        if origen == 'servidor':
-            return redirect(url_for('servidor'))
-        return redirect(url_for('cliente'))
-
-    except Exception as e:
-        print(f"[ERROR DIVINO] Error modificando producto: {e}")
-        return jsonify({'error': str(e)}), 500
-
-
-# ==================== RUTAS API ADICIONALES ====================
-
-# OBTENER TODOS LOS PRODUCTOS - API REST
-@app.route('/api/productos', methods=['GET'])
-def api_obtener_productos():
-    try:
-        productos = db.obtener_productos()
-        return jsonify({'success': True, 'productos': productos})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-
-# OBTENER UN PRODUCTO ESPECÍFICO
-@app.route('/api/producto/<int:id_producto>', methods=['GET'])
-def api_obtener_producto(id_producto):
-    try:
-        productos = db.obtener_productos()
-        producto = next((p for p in productos if p[0] == id_producto), None)
-
-        if producto:
-            return jsonify({
-                'success': True,
-                'producto': {
-                    'id': producto[0],
-                    'nombre': producto[1],
-                    'cantidad': producto[2],
-                    'precio': producto[3]
-                }
-            })
-        else:
-            return jsonify({'error': 'Producto no encontrado'}), 404
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-
-# ==================== EVENTOS WEBSOCKET ====================
+# ==================== HANDLERS DE EVENTOS SOCKET.IO ====================
 
 @socketio.on('connect')
 def handle_connect():
-    print(f"[CONEXIÓN DIVINA] Cliente conectado: {request.sid}")
-    # Enviar inventario actual al cliente que se conecta
+    print(f'Un nuevo cliente se ha conectado: {request.sid}')
     productos = db.obtener_productos()
     emit('inventario_inicial', {'productos': productos})
 
 
 @socketio.on('disconnect')
 def handle_disconnect():
-    print(f"[DESCONEXIÓN] Cliente desconectado: {request.sid}")
+    print(f'Un cliente se ha desconectado: {request.sid}')
 
 
-@socketio.on('solicitar_actualizacion')
-def handle_solicitar_actualizacion():
-    productos = db.obtener_productos()
-    emit('actualizar_inventario', {
-        'accion': 'actualización_solicitada',
-        'productos': productos
-    })
-
-
-# Evento para crear producto via WebSocket
-@socketio.on('crear_producto_ws')
-def handle_crear_producto_ws(data):
+@socketio.on('crear_producto')
+def handle_crear_producto(data):
     try:
         nombre = data.get('nombre')
-        cantidad = int(data.get('cantidad'))
-        precio = float(data.get('precio'))
+        cantidad = data.get('cantidad')
+        precio = data.get('precio')
+
+        if not nombre or cantidad is None or precio is None:
+            emit('error', {'mensaje': 'Faltan campos para crear el producto.'})
+            return
 
         db.crear_producto(nombre, cantidad, precio)
         productos = db.obtener_productos()
 
-        # Emitir a TODOS los clientes
-        socketio.emit('actualizar_inventario', {
+        # Emitir a todos los clientes que el inventario se ha actualizado
+        emit('actualizar_inventario', {
             'accion': 'crear',
             'productos': productos,
-            'mensaje': f'Producto {nombre} creado via WebSocket'
+            'mensaje': f'Producto "{nombre}" creado con éxito.'
         }, broadcast=True)
 
     except Exception as e:
         emit('error', {'mensaje': str(e)})
 
 
-# Evento para eliminar producto via WebSocket
-@socketio.on('eliminar_producto_ws')
-def handle_eliminar_producto_ws(data):
+@socketio.on('modificar_producto')
+def handle_modificar_producto(data):
     try:
-        id_producto = int(data.get('id'))
-
-        db.eliminar_producto(id_producto)
-        productos = db.obtener_productos()
-
-        socketio.emit('actualizar_inventario', {
-            'accion': 'eliminar',
-            'productos': productos,
-            'id_eliminado': id_producto,
-            'mensaje': f'Producto ID {id_producto} eliminado via WebSocket'
-        }, broadcast=True)
-
-    except Exception as e:
-        emit('error', {'mensaje': str(e)})
-
-
-# Evento para modificar producto via WebSocket
-@socketio.on('modificar_producto_ws')
-def handle_modificar_producto_ws(data):
-    try:
-        id_producto = int(data.get('id'))
+        id_producto = data.get('id')
         nombre = data.get('nombre')
-        cantidad = int(data.get('cantidad'))
-        precio = float(data.get('precio'))
+        cantidad = data.get('cantidad')
+        precio = data.get('precio')
+
+        if not id_producto or not nombre or cantidad is None or precio is None:
+            emit('error', {'mensaje': 'Faltan campos para modificar el producto.'})
+            return
 
         db.modificar_producto(id_producto, nombre, cantidad, precio)
         productos = db.obtener_productos()
 
-        socketio.emit('actualizar_inventario', {
+        # Emitir a todos los clientes que el inventario se ha actualizado
+        emit('actualizar_inventario', {
             'accion': 'modificar',
             'productos': productos,
             'id_modificado': id_producto,
-            'mensaje': f'Producto ID {id_producto} modificado via WebSocket'
+            'mensaje': f'Producto ID {id_producto} modificado con éxito.'
         }, broadcast=True)
 
     except Exception as e:
         emit('error', {'mensaje': str(e)})
+
+
+@socketio.on('eliminar_producto')
+def handle_eliminar_producto(data):
+    try:
+        id_producto = data.get('id')
+        if not id_producto:
+            emit('error', {'mensaje': 'Falta el ID del producto a eliminar.'})
+            return
+
+        db.eliminar_producto(id_producto)
+        productos = db.obtener_productos()
+
+        # Emitir a todos los clientes que el inventario se ha actualizado
+        emit('actualizar_inventario', {
+            'accion': 'eliminar',
+            'productos': productos,
+            'id_eliminado': id_producto,
+            'mensaje': f'Producto ID {id_producto} eliminado con éxito.'
+        }, broadcast=True)
+
+    except Exception as e:
+        emit('error', {'mensaje': str(e)})
+
+
+# ==================== RUTAS DE FORMULARIOS Y REDIRECCIÓN ====================
+
+# Ahora estas rutas solo redirigen a la lógica de Socket.IO
+@app.route('/producto/crear', methods=['POST'])
+def crear_producto_form():
+    data = request.form
+    nombre = data.get('nombre')
+    cantidad = int(data.get('cantidad'))
+    precio = float(data.get('precio'))
+    socketio.emit('crear_producto', {
+        'nombre': nombre,
+        'cantidad': cantidad,
+        'precio': precio
+    })
+    return jsonify({'success': True, 'mensaje': f'Petición de creación de "{nombre}" enviada a todos los clientes.'})
+
+
+@app.route('/producto/modificar/<int:id_producto>', methods=['PUT'])
+def modificar_producto_http(id_producto):
+    data = request.json
+    nombre = data.get('nombre')
+    cantidad = int(data.get('cantidad'))
+    precio = float(data.get('precio'))
+    socketio.emit('modificar_producto', {
+        'id': id_producto,
+        'nombre': nombre,
+        'cantidad': cantidad,
+        'precio': precio
+    })
+    return jsonify({'success': True,
+                    'mensaje': f'Petición de modificación del producto ID {id_producto} enviada a todos los clientes.'})
+
+
+@app.route('/producto/eliminar/<int:id_producto>', methods=['DELETE'])
+def eliminar_producto_http(id_producto):
+    socketio.emit('eliminar_producto', {'id': id_producto})
+    return jsonify({'success': True,
+                    'mensaje': f'Petición de eliminación del producto ID {id_producto} enviada a todos los clientes.'})
 
 
 # ==================== RUTA DE ESTADO/SALUD ====================
@@ -306,11 +187,7 @@ def status():
 
 if __name__ == '__main__':
     print("\n" + "=" * 50)
-    print("🔥 EL SERVIDOR DIVINO DEL INVENTARIO ESTÁ DESPERTANDO 🔥")
+    print("🔥 EL SERVIDOR DIVINO DEL INVENTARIO ESTÁ DESPERTANDO...")
+    print(f"🔗 Accede al Templo Principal en: http://127.0.0.1:5000/")
     print("=" * 50 + "\n")
-
-    socketio.run(app,
-                 debug=True,
-                 host='0.0.0.0',
-                 port=5000,
-                 allow_unsafe_werkzeug=True)
+    socketio.run(app, debug=True, allow_unsafe_werkzeug=True, host="0.0.0.0")

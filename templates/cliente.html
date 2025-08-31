@@ -1,10 +1,538 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👥 Cliente - Los Templos Menores 👥</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #2d1b69 0%, #11998e 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #00d2d3, #54a0ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .ip-info {
+            background: rgba(0, 255, 0, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .mensaje-error {
+            background: rgba(255, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .form-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+        }
+
+        .form-section h2 {
+            color: #00d2d3;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.5em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #e0e0e0;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group select option {
+            background: #2d1b69;
+            color: white;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #00d2d3;
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 10px rgba(0, 210, 211, 0.3);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .divine-button {
+            background: linear-gradient(45deg, #00d2d3, #54a0ff);
+            border: none;
+            color: white;
+            padding: 12px 25px;
+            font-size: 1em;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .divine-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .crear-btn {
+            background: linear-gradient(45deg, #ffa726, #ff9800);
+        }
+
+        .crear-btn:hover {
+            background: linear-gradient(45deg, #ff9800, #ffa726);
+        }
+
+        .products-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+        }
+
+        .products-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .products-header h2 {
+            color: #00d2d3;
+            font-size: 1.5em;
+        }
+
+        .status-indicator {
+            background: rgba(0, 255, 0, 0.3);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .products-grid {
+            display: grid;
+            gap: 15px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .product-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .product-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #00d2d3;
+        }
+
+        .product-id {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+        }
+
+        .product-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .detail-item {
+            text-align: center;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+        }
+
+        .detail-label {
+            font-size: 0.8em;
+            opacity: 0.8;
+            margin-bottom: 3px;
+        }
+
+        .detail-value {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .edit-btn {
+            background: linear-gradient(45deg, #ffa726, #ff9800);
+            color: white;
+        }
+
+        .delete-btn {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .no-products {
+            text-align: center;
+            padding: 40px;
+            opacity: 0.7;
+            font-style: italic;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Scrollbar personalizado */
+        .products-grid::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .products-grid::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .products-grid::-webkit-scrollbar-thumb {
+            background: rgba(0, 210, 211, 0.5);
+            border-radius: 4px;
+        }
+
+        .products-grid::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 210, 211, 0.7);
+        }
+
+        @media (max-width: 900px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <span>coman monda</span>
+    <button class="back-btn" onclick="location.href='/'">← Volver al Inicio</button>
+    <div class="header">
+        <h1>👥 El Templo Menor del Cliente 👥</h1>
+        <p>Panel de Control del Inventario Divino</p>
+        <div class="ip-info">
+            <span id="ip-display">IP del Cliente: {{ ip if ip else 'No detectada' }}</span>
+        </div>
+        {% if mensaje %}
+        <div class="mensaje-error">
+            {{ mensaje }}
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="main-container">
+        <!-- Sección de Creación de Productos -->
+        <div class="form-section">
+            <h2>🛍️ Crear Producto Divino</h2>
+            <form id="formCrearProducto">
+                <div class="form-group">
+                    <label for="nombre">📦 Nombre del Producto:</label>
+                    <input type="text" id="nombre" name="nombre" placeholder="Ingresa el nombre sagrado..." required>
+                </div>
+
+                <div class="form-group">
+                    <label for="cantidad">📊 Cantidad:</label>
+                    <input type="number" id="cantidad" name="cantidad" placeholder="¿Cuántos existen?" min="0" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="precio">💰 Precio:</label>
+                    <input type="number" id="precio" name="precio" placeholder="Su valor en el reino..." step="0.01" min="0" required>
+                </div>
+
+                <button type="submit" class="divine-button crear-btn">✨ Crear Producto ✨</button>
+            </form>
+        </div>
+
+        <!-- Sección de Inventario -->
+        <div class="products-section">
+            <div class="products-header">
+                <h2>📋 Inventario Sagrado</h2>
+                <div class="status-indicator" id="statusIndicator">
+                    🟢 En Línea
+                </div>
+            </div>
+
+            <div class="products-grid" id="productosContainer">
+                {% if productos %}
+                    {% for producto in productos %}
+                    <div class="product-card" data-id="{{ producto['id'] }}">
+                        <div class="product-header">
+                            <span class="product-name">{{ producto['nombre'] }}</span>
+                            <span class="product-id">ID: {{ producto['id'] }}</span>
+                        </div>
+
+                        <div class="product-details">
+                            <div class="detail-item">
+                                <div class="detail-label">Cantidad</div>
+                                <div class="detail-value">{{ producto['cantidad'] }}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Precio</div>
+                                <div class="detail-value">${{ "%.2f"|format(producto['precio']) }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-products">
+                        <h3>🏺 El inventario está vacío</h3>
+                        <p>Los dioses esperan que añadas el primer producto sagrado...</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Inicializar Socket.IO
+        const socket = io();
+        let productos = [];
+
+        // Eventos de Socket.IO
+        socket.on('connect', function() {
+            console.log('🔥 Conectado al servidor divino');
+            document.getElementById('statusIndicator').innerHTML = '🟢 En Línea';
+        });
+
+        socket.on('disconnect', function() {
+            console.log('💔 Desconectado del servidor');
+            document.getElementById('statusIndicator').innerHTML = '🔴 Desconectado';
+        });
+
+        socket.on('actualizar_inventario', function(data) {
+            console.log('📦 Actualizando inventario:', data);
+            productos = data.productos;
+            actualizarInterfazInventario();
+
+            // Mostrar mensaje de acción
+            if (data.mensaje) {
+                mostrarNotificacion(data.mensaje, 'success');
+            }
+        });
+
+        socket.on('inventario_inicial', function(data) {
+            console.log('📋 Inventario inicial recibido');
+            productos = data.productos;
+            actualizarInterfazInventario();
+        });
+
+        socket.on('error', function(data) {
+            mostrarNotificacion(data.mensaje, 'error');
+        });
+
+        // Funciones de la interfaz
+        function actualizarInterfazInventario() {
+            const container = document.getElementById('productosContainer');
+
+            if (!productos || productos.length === 0) {
+                container.innerHTML = `
+                    <div class="no-products">
+                        <h3>🏺 El inventario está vacío</h3>
+                        <p>Los dioses esperan que añadas el primer producto sagrado...</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = productos.map(producto => `
+                <div class="product-card" data-id="${producto.id}">
+                    <div class="product-header">
+                        <span class="product-name">${producto.nombre}</span>
+                        <span class="product-id">ID: ${producto.id}</span>
+                    </div>
+
+                    <div class="product-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Cantidad</div>
+                            <div class="detail-value">${producto.cantidad}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Precio</div>
+                            <div class="detail-value">$${parseFloat(producto.precio).toFixed(2)}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function mostrarNotificacion(mensaje, tipo) {
+            const notificacion = document.createElement('div');
+            notificacion.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                border-radius: 8px;
+                color: white;
+                font-weight: bold;
+                z-index: 2000;
+                animation: slideIn 0.3s ease;
+                max-width: 300px;
+                word-wrap: break-word;
+            `;
+
+            if (tipo === 'success') {
+                notificacion.style.background = 'linear-gradient(45deg, #27ae60, #2ecc71)';
+            } else {
+                notificacion.style.background = 'linear-gradient(45deg, #e74c3c, #c0392b)';
+            }
+
+            notificacion.textContent = mensaje;
+            document.body.appendChild(notificacion);
+
+            setTimeout(() => {
+                notificacion.remove();
+            }, 4000);
+        }
+
+        // Event Listeners
+        document.getElementById('formCrearProducto').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            socket.emit('crear_producto', {
+                nombre: formData.get('nombre'),
+                cantidad: parseInt(formData.get('cantidad')),
+                precio: parseFloat(formData.get('precio'))
+            });
+            this.reset();
+        });
+
+        // Añadir estilos de animación
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Cliente inicializado - Esperando conexión divina...');
+        });
+    </script>
 </body>
 </html>
