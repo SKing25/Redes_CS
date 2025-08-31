@@ -1,1 +1,265 @@
-/* Malparidos como esperaban que les hiciera las vistas si ni siquiera les da para crearme el static */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Dynamic Color Variables (Default to Mint) */
+:root {
+    --primary: #00695c;
+    --secondary: #26a69a;
+    --accent: #ff4081;
+    --bg-primary: #e0f2f1;
+    --bg-secondary: #b2dfdb;
+    --text: #004d40;
+    --text-light: #00796b;
+    --card-bg: rgba(255, 255, 255, 0.9);
+    --surface-border: rgba(0, 0, 0, 0.05);
+    --subtle-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --focus-ring: 0 0 0 3px rgba(0, 105, 92, 0.2);
+    --white: #ffffff;
+    --black: #000000;
+}
+
+/* Dark Mode Overrides */
+body.dark-mode {
+    --primary: #45b0a3;
+    --secondary: #7ed2c7;
+    --accent: #ff6b6b;
+    --bg-primary: #0a2d2a;
+    --bg-secondary: #1a5e5e;
+    --text: #d0f7f3;
+    --text-light: #94c4c2;
+    --card-bg: rgba(26, 45, 42, 0.9);
+    --surface-border: rgba(255, 255, 255, 0.05);
+    --subtle-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --focus-ring: 0 0 0 3px rgba(126, 210, 199, 0.3);
+}
+
+/* Theme-Specific Overrides (Light) */
+body.theme-ocean {
+    --primary: #0077be; --secondary: #00a8cc; --accent: #ffd23f;
+    --bg-primary: #f8fdff; --bg-secondary: #e3f2fd; --text: #1a365d;
+    --text-light: #4a90a4; --focus-ring: 0 0 0 3px rgba(0, 119, 190, 0.2);
+}
+/* etc. for other themes... */
+
+/* General Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+    color: var(--text);
+    line-height: 1.6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem;
+    transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+.main-card {
+    background: var(--card-bg);
+    border: 1px solid var(--surface-border);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 3rem;
+    box-shadow: var(--subtle-shadow);
+    max-width: 650px;
+    width: 100%;
+    text-align: center;
+    transition: background-color 0.5s ease, box-shadow 0.5s ease;
+}
+
+h1.page-title {
+    font-size: 2.5rem;
+    font-weight: 300;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+    position: relative;
+    display: inline-block;
+}
+
+h1.page-title::after {
+    content: '';
+    display: block;
+    width: 80px;
+    height: 3px;
+    background: var(--accent);
+    margin: 10px auto 0;
+    border-radius: 2px;
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: var(--text-light);
+    margin-bottom: 2rem;
+}
+
+.info-text {
+    font-size: 1rem;
+    margin-bottom: 2.5rem;
+    color: var(--text);
+    opacity: 0.8;
+}
+
+.button-group {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.action-button {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 1rem 2.5rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    max-width: 250px;
+    background-color: var(--primary);
+    color: var(--white);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.action-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.action-button:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+.btn-secondary {
+    background-color: var(--accent);
+}
+
+.btn-secondary:hover {
+    background-color: var(--primary);
+    color: var(--white);
+}
+
+.footer {
+    position: fixed;
+    bottom: 1.5rem;
+    font-size: 0.85rem;
+    color: var(--text);
+    opacity: 0.6;
+}
+
+/* Utility classes for icons and text */
+.icon-left {
+    margin-right: 0.5rem;
+}
+
+.icon-right {
+    margin-left: 0.5rem;
+}
+
+/* Estilos para el nuevo selector de Cliente/Servidor */
+.page-selector {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 1rem;
+    z-index: 1000;
+    background: var(--card-bg);
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    box-shadow: var(--shadow-heavy);
+    backdrop-filter: blur(10px);
+    border: 2px solid var(--primary-color);
+    transition: var(--transition-smooth);
+}
+
+.page-item {
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: 30px;
+    transition: var(--transition-smooth);
+    position: relative;
+    overflow: hidden;
+}
+
+.page-item::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%) scaleX(0);
+    width: 80%;
+    height: 3px;
+    background: var(--accent-color);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.page-item:hover {
+    color: var(--primary-color);
+}
+
+.page-item.active {
+    color: white;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    box-shadow: var(--shadow-medium);
+}
+
+.page-item.active::after {
+    transform: translateX(-50%) scaleX(1);
+}
+
+
+/* Estilos para la tabla */
+.styled-table {
+    border-collapse: collapse;
+    margin: 25px 0;
+    font-size: 0.9em;
+    font-family: 'Inter', sans-serif;
+    min-width: 400px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.styled-table thead tr {
+    background-color: var(--primary);
+    color: var(--white);
+    text-align: left;
+    font-weight: bold;
+}
+
+.styled-table th,
+.styled-table td {
+    padding: 12px 15px;
+}
+
+.styled-table tbody tr {
+    border-bottom: 1px solid var(--surface-border);
+}
+
+.styled-table tbody tr:nth-of-type(even) {
+    background-color: var(--bg-secondary);
+}
+
+.styled-table tbody tr:last-of-type {
+    border-bottom: 2px solid var(--primary);
+}
+
+.styled-table tbody tr.active-row {
+    font-weight: bold;
+    color: var(--primary);
+}
