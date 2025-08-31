@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -5,7 +6,6 @@
     <title>⚡ Servidor - El Templo Central ⚡</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
-    
 </head>
 <body>
    <label class="theme-switch position-top-right">
@@ -103,7 +103,7 @@
                         </div>
 
                         <div class="product-actions">
-                            <button class="action-btn edit-btn" onclick="editarProducto({{ producto['id'] }}, {{ producto['nombre']|tojson }}, {{ producto['cantidad'] }}, {{ producto['precio'] }})">
+                            <button class="action-btn edit-btn" onclick="editarProducto({{ producto['id'] }}, '{{ producto['nombre']|replace("'", "\\'") }}', {{ producto['cantidad'] }}, {{ producto['precio'] }})">
                                 ✏️ Editar
                             </button>
                             <button class="action-btn delete-btn" onclick="eliminarProducto({{ producto['id'] }})">
@@ -165,8 +165,7 @@
         // Función para eliminar producto
         function eliminarProducto(id) {
             if (confirm('¿Estás seguro de que deseas eliminar este producto divino?')) {
-                // Aquí iría la lógica para eliminar el producto
-                fetch(`/eliminar/${id}`, {
+                fetch('/eliminar/' + id, {
                     method: 'DELETE',
                 })
                 .then(response => response.json())
@@ -220,7 +219,7 @@
                 e.preventDefault();
                 const formData = new FormData(this);
                 
-                fetch(`/editar/${editandoId}`, {
+                fetch('/editar/' + editandoId, {
                     method: 'PUT',
                     body: formData
                 })
