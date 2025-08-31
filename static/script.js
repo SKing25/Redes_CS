@@ -1,5 +1,5 @@
 // ================================
-// MÓDULO: ThemeManager
+// MÓDULO: ThemeManager 
 // ================================
 class ThemeManager {
     constructor() {
@@ -14,7 +14,7 @@ class ThemeManager {
         const savedTheme = this.getSavedTheme() || 'light';
         this.applyTheme(savedTheme);
         
-        this.themeToggle.addEventListener('click', () => this.toggleTheme());
+        this.themeToggle.addEventListener('change', () => this.toggleTheme());
     }
     
     getSavedTheme() {
@@ -36,25 +36,22 @@ class ThemeManager {
     }
     
     applyTheme(theme) {
-        this.body.setAttribute('data-theme', theme);
+        // Aplicar clase al body (para que coincida con el CSS)
+        if (theme === 'dark') {
+            this.body.classList.add('dark-mode');
+            this.themeToggle.checked = true;
+        } else {
+            this.body.classList.remove('dark-mode');
+            this.themeToggle.checked = false;
+        }
+        
         this.saveTheme(theme);
-        this.updateToggleState(theme);
     }
 
     toggleTheme() {
-        const newTheme = this.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        const isDark = this.themeToggle.checked;
+        const newTheme = isDark ? 'dark' : 'light';
         this.applyTheme(newTheme);
-    }
-    
-    updateToggleState(theme) {
-        if (!this.themeToggle) return;
-        if (theme === 'dark') {
-            this.themeToggle.classList.remove('light');
-            this.themeToggle.classList.add('dark');
-        } else {
-            this.themeToggle.classList.remove('dark');
-            this.themeToggle.classList.add('light');
-        }
     }
     
     setCookieTheme(theme) {
