@@ -10,6 +10,11 @@
     <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 </head>
 <body>
+    {% if mensaje %}
+        <div class="mensaje-error">
+            {{ mensaje }}
+        </div>
+    {% else %}
     <label class="theme-switch position-top-right">
         <input type="checkbox" id="themeToggle" class="theme-switch__checkbox">
         <div class="theme-switch__container">
@@ -44,11 +49,7 @@
         <div class="ip-info">
             <span id="ip-display">IP del Cliente: {{ ip if ip else 'No detectada' }}</span>
         </div>
-        {% if mensaje %}
-        <div class="mensaje-error">
-            {{ mensaje }}
-        </div>
-        {% endif %}
+
     </div>
 
     <div class="main-container">
@@ -114,6 +115,7 @@
             </div>
         </div>
     </div>
+    {% endif %}
 
   
 </body>
