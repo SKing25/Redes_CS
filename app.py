@@ -22,7 +22,7 @@ def index():
 def servidor():
     ip_servidor = request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0].strip()
     if ip_servidor not in IPS_PERMITIDAS_SERVIDOR:
-        return render_template('servidor.html', mensaje=f"BRO tu ip no es servidor {ip_servidor}")
+        return render_template('servidor.html', mensaje=f"Tu ip no es de servidor {ip_servidor}")
     productos = db.obtener_productos()
     return render_template('servidor.html', productos=productos, ip=ip_servidor)
 
@@ -31,7 +31,7 @@ def servidor():
 def cliente():
     ip_cliente = request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0].strip()
     if ip_cliente not in IPS_PERMITIDAS_CLIENTE:
-        return render_template('cliente.html', mensaje=f"BRO tu ip no es cliente {ip_cliente}")
+        return render_template('cliente.html', mensaje=f"Tu ip no es de cliente {ip_cliente}")
     productos = db.obtener_productos()
     return render_template('cliente.html', productos=productos, ip=ip_cliente)
 
@@ -186,8 +186,5 @@ def status():
 # ==================== PUNTO DE ENTRADA PRINCIPAL ====================
 
 if __name__ == '__main__':
-    print("\n" + "=" * 50)
-    print("🔥 EL SERVIDOR DIVINO DEL INVENTARIO ESTÁ DESPERTANDO...")
-    print(f"🔗 Accede al Templo Principal en: http://127.0.0.1:5000/")
-    print("=" * 50 + "\n")
+  
     socketio.run(app, debug=True, allow_unsafe_werkzeug=True, host="0.0.0.0")
