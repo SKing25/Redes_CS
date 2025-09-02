@@ -130,7 +130,7 @@
     <!-- Modal de Edición -->
     <div id="modalEditar" style="display: none;">
         <div class="modal-card">
-            <h3>✏️ Editar Producto Divino</h3>
+            <h3>✏️ Editar Producto </h3>
             <form id="formEditarProducto">
                 <input type="hidden" id="editId" name="id">
                 <div class="form-group">
@@ -169,7 +169,7 @@
 
         // Función para eliminar producto
         function eliminarProducto(id) {
-            if (confirm('¿Estás seguro de que deseas eliminar este producto divino?')) {
+            if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
                 fetch('/eliminar/' + id, {
                     method: 'DELETE',
                 })
