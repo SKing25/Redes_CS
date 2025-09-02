@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚡ Servidor - El Templo Central ⚡</title>
+    <title> Servidor </title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
 </head>
@@ -44,8 +44,8 @@
     </div>
 
     <div class="header">
-        <h1>⚡ El Templo Central del Servidor ⚡</h1>
-        <p>Panel de Control Supremo del Inventario Divino</p>
+        <h1> Servidor </h1>
+        <p>Panel de Control del Inventario </p>
         <div class="ip-info">
             <span id="ip-display">IP del Servidor: {{ ip if ip else 'No detectada' }}</span>
         </div>
@@ -55,7 +55,7 @@
     <div class="main-container">
         <!-- Sección de Creación de Productos -->
         <div class="form-section">
-            <h2>🛍️ Crear Producto Divino</h2>
+            <h2>🛍️ Crear Producto </h2>
             <form id="formCrearProducto">
                 <div class="form-group">
                     <label for="nombre">📦 Nombre del Producto:</label>
@@ -80,7 +80,7 @@
         <!-- Sección de Inventario -->
         <div class="products-section">
             <div class="products-header">
-                <h2>📋 Inventario Sagrado</h2>
+                <h2>📋 Inventario </h2>
                 <div class="status-indicator" id="statusIndicator">
                     🟢 En Línea
                 </div>
@@ -120,7 +120,7 @@
                 {% else %}
                 <div class="no-products">
                     <h3>🏺 El inventario está vacío</h3>
-                    <p>Los dioses esperan que añadas el primer producto sagrado...</p>
+                    <p> Añade el primer producto </p>
                 </div>
                 {% endif %}
             </div>
