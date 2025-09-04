@@ -1,22 +1,19 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
 import db
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'el-codigo-divino-2024'
 socketio = SocketIO(app, cors_allowed_origins="*")
 db.init_db()
 
-IPS_PERMITIDAS_SERVIDOR = ['192.168.1.1', '127.0.0.1', '186.155.14.223']
+IPS_PERMITIDAS_SERVIDOR = ['192.168.1.1', '127.0.0.1']
 IPS_PERMITIDAS_CLIENTE = ['192.168.1.2', '192.168.1.3', '127.0.0.1']
-
 
 # ==================== RUTAS PRINCIPALES ====================
 
 @app.route('/')
 def index():
     return render_template('index.html')
-
 
 @app.route('/servidor', methods=['GET'])
 def servidor():
@@ -139,8 +136,7 @@ def crear_producto_form():
         'cantidad': cantidad,
         'precio': precio
     })
-    return jsonify({'success': True, 'mensaje': f'Petición de creación de "{nombre}" enviada a todos los clientes.'})
-
+    return ''
 
 @app.route('/producto/modificar/<int:id_producto>', methods=['PUT'])
 def modificar_producto_http(id_producto):
@@ -154,37 +150,20 @@ def modificar_producto_http(id_producto):
         'cantidad': cantidad,
         'precio': precio
     })
-    return jsonify({'success': True,
-                    'mensaje': f'Petición de modificación del producto ID {id_producto} enviada a todos los clientes.'})
-
+    return ''
 
 @app.route('/producto/eliminar/<int:id_producto>', methods=['DELETE'])
 def eliminar_producto_http(id_producto):
     socketio.emit('eliminar_producto', {'id': id_producto})
-    return jsonify({'success': True,
-                    'mensaje': f'Petición de eliminación del producto ID {id_producto} enviada a todos los clientes.'})
-
+    return ''
 
 # ==================== RUTA DE ESTADO/SALUD ====================
 
-@app.route('/status')
-def status():
-    try:
-        productos = db.obtener_productos()
-        return jsonify({
-            'status': 'El servidor divino está operativo',
-            'total_productos': len(productos),
-            'mensaje': 'El templo del inventario funciona perfectamente'
-        })
-    except Exception as e:
-        return jsonify({
-            'status': 'error',
-            'mensaje': str(e)
-        }), 500
-
+@app.route('/hola-mundo')
+def hola_mundo():
+    return "Hola Mundo"
 
 # ==================== PUNTO DE ENTRADA PRINCIPAL ====================
 
 if __name__ == '__main__':
-  
     socketio.run(app, debug=True, allow_unsafe_werkzeug=True, host="0.0.0.0")

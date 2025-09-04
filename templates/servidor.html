@@ -173,18 +173,13 @@
                 fetch('/eliminar/' + id, {
                     method: 'DELETE',
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            location.reload();
-                        } else {
-                            alert('Error al eliminar el producto');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Error al eliminar el producto');
-                    });
+                .then(() => {
+                    location.reload();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al eliminar el producto');
+                });
             }
         }
 
@@ -205,18 +200,13 @@
                     method: 'POST',
                     body: formData
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            location.reload();
-                        } else {
-                            alert('Error al crear el producto');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Error al crear el producto');
-                    });
+                .then(() => {
+                    location.reload();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al crear el producto');
+                });
             });
 
             // Formulario de editar producto
@@ -228,18 +218,13 @@
                     method: 'PUT',
                     body: formData
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            location.reload();
-                        } else {
-                            alert('Error al editar el producto');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Error al editar el producto');
-                    });
+                .then(() => {
+                    location.reload();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al editar el producto');
+                });
             });
 
             // Cerrar modal al hacer clic fuera
