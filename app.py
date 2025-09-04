@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
 import db
+import os
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -18,7 +19,7 @@ def index():
 @app.route('/servidor', methods=['GET'])
 def servidor():
     ip_servidor = request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0].strip()
-    if ip_servidor not in IPS_PERMITIDAS_SERVIDOR:
+    if os.environ.get('RENDER', '').lower() != 'true' and ip_servidor not in IPS_PERMITIDAS_SERVIDOR:
         return render_template('servidor.html', mensaje=f"Tu ip no es de servidor {ip_servidor}")
     productos = db.obtener_productos()
     return render_template('servidor.html', productos=productos, ip=ip_servidor)
@@ -27,7 +28,7 @@ def servidor():
 @app.route('/cliente', methods=['GET'])
 def cliente():
     ip_cliente = request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0].strip()
-    if ip_cliente not in IPS_PERMITIDAS_CLIENTE:
+    if os.environ.get('RENDER', '').lower() != 'true' and ip_cliente not in IPS_PERMITIDAS_CLIENTE:
         return render_template('cliente.html', mensaje=f"Tu ip no es de cliente {ip_cliente}")
     productos = db.obtener_productos()
     return render_template('cliente.html', productos=productos, ip=ip_cliente)
