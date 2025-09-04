@@ -218,7 +218,7 @@ class InventoryAdmin {
             container.innerHTML = `
                 <div class="no-products">
                     <h3>🏺 El inventario está vacío</h3>
-                    <p>Los dioses esperan que añadas el primer producto sagrado...</p>
+                    <p>Añade el primer producto</p>
                 </div>
             `;
             return;
@@ -431,7 +431,7 @@ class InventoryClient {
             container.innerHTML = `
                 <div class="no-products">
                     <h3>🏺 El inventario está vacío</h3>
-                    <p>Los dioses esperan que añadas el primer producto sagrado...</p>
+                    <p>Añade el primer producto</p>
                 </div>
             `;
             return;
